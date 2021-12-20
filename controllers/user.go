@@ -21,7 +21,6 @@ func (uc userController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			uc.getAll(w, r)
 		case http.MethodPost:
 			uc.post(w, r)
-			// w.WriteHeader(http.StatusNotImplemented)
 		}
 	} else {
 		matches := uc.userIDpattern.FindStringSubmatch(r.URL.Path)
@@ -35,6 +34,7 @@ func (uc userController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Printf("failed to convert id: %s", err)
 			w.WriteHeader(http.StatusNotFound)
 		}
+		log.Printf("r.Method: %s", r.Method)
 		switch r.Method {
 		case http.MethodGet:
 			uc.get(id, w)
@@ -42,8 +42,13 @@ func (uc userController) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			uc.put(id, w, r)
 		case http.MethodDelete:
 			uc.delete(id, w)
+		case http.MethodPost:
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		default:
-			w.WriteHeader(http.StatusNotImplemented)
+			log.Printf("loudly fail default case: ")
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
 	}
